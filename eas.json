@@ -1,0 +1,13 @@
+{
+  "build": {
+    "production": {
+      "android": {
+        "releaseChannel": "production"
+      }
+    },
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal"
+    }
+  }
+}

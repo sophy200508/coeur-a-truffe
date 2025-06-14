@@ -1,0 +1,1 @@
+export default function CommunauteScreen() {return null;}
