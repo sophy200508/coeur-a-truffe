@@ -1,30 +1,40 @@
 {
   "expo": {
-    "name": "Coeur à Truffe",
+    "name": "CoeurATruffe",
     "slug": "coeur-a-truffe",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
     "assetBundlePatterns": [
       "**/*"
     ],
+    "android": {
+      "package": "com.sophy.coeuratruffe",
+      "versionCode": 1,
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#FFFFFF"
+      }
+    },
     "ios": {
       "supportsTablet": true
     },
-    "android": {
-      "package": "com.sophy.coeuratruf"
+    "web": {
+      "favicon": "./assets/favicon.png"
     },
     "extra": {
       "eas": {
         "projectId": "fe899711-88cf-42e8-b194-d5609949ac62"
       }
     },
-    "sdkVersion": "53.0.0",
-    "platforms": [
-      "ios",
-      "android",
-      "web"
-    ]
+    "cli": {
+      "appVersionSource": "remote"
+    }
   }
 }
