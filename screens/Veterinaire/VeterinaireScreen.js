@@ -1,0 +1,1 @@
+export default function VeterinaireScreen() {return null;}
