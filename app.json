@@ -1,0 +1,42 @@
+{
+  "expo": {
+    "name": "CoeurATruffe",
+    "slug": "coeur-a-truffe",
+    "version": "1.0.2",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "android": {
+      "package": "com.sophy.coeuratruffe",
+      "versionCode": 3,
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#FFFFFF"
+      }
+    },
+    "ios": {
+      "supportsTablet": true
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "fe899711-88cf-42e8-b194-d5609949ac62"
+      }
+    },
+    "plugins": [
+      "expo-audio",
+      "expo-video",
+      "expo-asset"
+    ]
+  }
+}

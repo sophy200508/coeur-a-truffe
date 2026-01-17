@@ -1,0 +1,24 @@
+# Ignorer les fichiers/dossiers inutiles pour le build
+node_modules/
+.expo/
+.expo-shared/
+.vscode/
+.DS_Store
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+expo-debug.log*
+.cache/
+tmp/
+build/
+web-build/
+
+# Ignorer les fichiers de config perso
+.env
+.env.local
+.env.*.local
+credentials.json
+
+# Ignorer les dossiers natifs si tu utilises Prebuild
+ios/
+android/

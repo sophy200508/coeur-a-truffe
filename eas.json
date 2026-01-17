@@ -1,0 +1,14 @@
+{
+  "build": {
+    "production": {
+      "developmentClient": false,
+      "distribution": "store",
+      "android": {
+        "buildType": "app-bundle"
+      }
+    }
+  },
+  "cli": {
+    "version": ">= 3.0.0"
+  }
+}
