@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import ScreenBackground from '../../components/ScreenBackground';
 import {
-  View,
   ScrollView,
   StyleSheet,
   Alert,
@@ -20,7 +18,6 @@ const fondInscription = require('../../../assets/fondInscription.png');
 const KEY_USER = 'userData';
 const KEY_ONBOARD = 'onboarding_done';
 
-// helpers
 const emailOk = (v = '') => /^\S+@\S+\.\S+$/.test(v.trim());
 const dateOk = (v = '') => {
   const t = v.trim();
@@ -38,13 +35,13 @@ const norm = (s = '') => s.trim();
 export default function InscriptionScreen({ navigation, onRegistered }) {
   const [form, setForm] = useState({
     prenomHumain: '',
-    tadatedenaissance: '', // JJ/MM/AAAA ou YYYY-MM-DD
+    tadatedenaissance: '',
     email: '',
     prenomChien: '',
     raceChien: '',
     dateNaissanceChien: '',
-    sexeChien: '', // "Mâle" | "Femelle"
-    sterilisation: '', // "Oui" | "Non"
+    sexeChien: '',
+    sterilisation: '',
     niveauActivite: '',
     photoUri: '',
     adresseRue: '',
@@ -55,7 +52,6 @@ export default function InscriptionScreen({ navigation, onRegistered }) {
   });
   const [isLoading, setIsLoading] = useState(false);
 
-  // si déjà onboardé → on sort
   useEffect(() => {
     (async () => {
       const done = await AsyncStorage.getItem(KEY_ONBOARD);
@@ -77,7 +73,6 @@ export default function InscriptionScreen({ navigation, onRegistered }) {
     if (!dateOk(form.tadatedenaissance)) manquants.push('Ta date de naissance (JJ/MM/AAAA)');
     if (!dateOk(form.dateNaissanceChien)) manquants.push('Date de naissance du chien (JJ/MM/AAAA)');
     if (!form.consentement) manquants.push('Consentement');
-
     if (manquants.length) {
       Alert.alert('Champs à corriger', `• ${manquants.join('\n• ')}`);
       return false;
@@ -87,7 +82,6 @@ export default function InscriptionScreen({ navigation, onRegistered }) {
 
   const handleSubmit = async () => {
     if (!validate()) return;
-
     setIsLoading(true);
     try {
       const payload = {
@@ -108,11 +102,32 @@ export default function InscriptionScreen({ navigation, onRegistered }) {
       await AsyncStorage.setItem(KEY_USER, JSON.stringify(payload));
       await AsyncStorage.setItem(KEY_ONBOARD, 'true');
 
-      // ✅ IMPORTANT : on notifie App.js pour qu'il repasse isRegistered à true
+      // ✅ WEBHOOK MAKE
+      try {
+        await fetch('https://hook.eu1.make.com/uki8z97l9opbxmtbl5n37457fdzzv8uq', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            prenom: payload.prenomHumain,
+            email: payload.email,
+            date_naissance: payload.tadatedenaissance,
+            prenom_chien: payload.prenomChien,
+            race_chien: payload.raceChien,
+            sexe_chien: payload.sexeChien,
+            sterilisation: payload.sterilisation,
+            niveau_activite: payload.niveauActivite,
+            date_naissance_chien: payload.dateNaissanceChien,
+            ville: payload.adresseVille,
+            date_inscription: new Date().toISOString(),
+          }),
+        });
+      } catch (webhookError) {
+        console.log('Webhook Make non envoyé :', webhookError);
+      }
+      // ✅ FIN WEBHOOK
+
       await onRegistered?.();
-
       setIsLoading(false);
-
       navigation.reset({
         index: 0,
         routes: [{ name: 'Accueil', params: { userData: payload } }],
@@ -126,102 +141,21 @@ export default function InscriptionScreen({ navigation, onRegistered }) {
   return (
     <ImageBackground source={fondInscription} style={styles.background} resizeMode="cover">
       <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
-        <ChampTexte
-          label="Ton Prénom"
-          placeholder="ex: Sophie"
-          value={form.prenomHumain}
-          onChangeText={(v) => handleChange('prenomHumain', v)}
-        />
-
-        <ChampTexte
-          label="Ta date de naissance"
-          placeholder="JJ/MM/AAAA"
-          value={form.tadatedenaissance}
-          onChangeText={(v) => handleChange('tadatedenaissance', v)}
-        />
-
-        <ChampTexte
-          label="Email"
-          placeholder="ex: sophie@email.com"
-          value={form.email}
-          onChangeText={(v) => handleChange('email', v)}
-          keyboardType="email-address"
-          autoCapitalize="none"
-        />
-
-        <ChampTexte
-          label="Prénom du chien"
-          placeholder="ex: Clem"
-          value={form.prenomChien}
-          onChangeText={(v) => handleChange('prenomChien', v)}
-        />
-
-        <ChampTexte
-          label="Race du chien (optionnel)"
-          placeholder="ex: Saint-Bernard"
-          value={form.raceChien}
-          onChangeText={(v) => handleChange('raceChien', v)}
-        />
-
-        <ChampTexte
-          label="Date de naissance du chien"
-          placeholder="JJ/MM/AAAA"
-          value={form.dateNaissanceChien}
-          onChangeText={(v) => handleChange('dateNaissanceChien', v)}
-        />
-
-        <ChampSelect
-          label="Sexe du chien"
-          value={form.sexeChien}
-          onChange={(v) => handleChange('sexeChien', v)}
-          options={['Mâle', 'Femelle']}
-        />
-
-        <ChampSelect
-          label="Stérilisé/Castré"
-          value={form.sterilisation}
-          onChange={(v) => handleChange('sterilisation', v)}
-          options={['Oui', 'Non']}
-        />
-
-        <ChampSelect
-          label="Niveau d’activité du chien (optionnel)"
-          value={form.niveauActivite}
-          onChange={(v) => handleChange('niveauActivite', v)}
-          options={['Calme', 'Modéré', 'Actif']}
-        />
-
+        <ChampTexte label="Ton Prénom" placeholder="ex: Sophie" value={form.prenomHumain} onChangeText={(v) => handleChange('prenomHumain', v)} />
+        <ChampTexte label="Ta date de naissance" placeholder="JJ/MM/AAAA" value={form.tadatedenaissance} onChangeText={(v) => handleChange('tadatedenaissance', v)} />
+        <ChampTexte label="Email" placeholder="ex: sophie@email.com" value={form.email} onChangeText={(v) => handleChange('email', v)} keyboardType="email-address" autoCapitalize="none" />
+        <ChampTexte label="Prénom du chien" placeholder="ex: Clem" value={form.prenomChien} onChangeText={(v) => handleChange('prenomChien', v)} />
+        <ChampTexte label="Race du chien (optionnel)" placeholder="ex: Saint-Bernard" value={form.raceChien} onChangeText={(v) => handleChange('raceChien', v)} />
+        <ChampTexte label="Date de naissance du chien" placeholder="JJ/MM/AAAA" value={form.dateNaissanceChien} onChangeText={(v) => handleChange('dateNaissanceChien', v)} />
+        <ChampSelect label="Sexe du chien" value={form.sexeChien} onChange={(v) => handleChange('sexeChien', v)} options={['Mâle', 'Femelle']} />
+        <ChampSelect label="Stérilisé/Castré" value={form.sterilisation} onChange={(v) => handleChange('sterilisation', v)} options={['Oui', 'Non']} />
+        <ChampSelect label="Niveau d'activité du chien (optionnel)" value={form.niveauActivite} onChange={(v) => handleChange('niveauActivite', v)} options={['Calme', 'Modéré', 'Actif']} />
         <UploadPhoto onPhotoSelected={(uri) => handleChange('photoUri', uri)} />
-
-        <ChampTexte
-          label="Rue (optionnel)"
-          placeholder="ex: 12 rue du Bonheur"
-          value={form.adresseRue}
-          onChangeText={(v) => handleChange('adresseRue', v)}
-        />
-        <ChampTexte
-          label="Ville (optionnel)"
-          placeholder="ex: Lyon"
-          value={form.adresseVille}
-          onChangeText={(v) => handleChange('adresseVille', v)}
-        />
-        <ChampTexte
-          label="Code Postal (optionnel)"
-          placeholder="ex: 69000"
-          value={form.adresseCodePostal}
-          onChangeText={(v) => handleChange('adresseCodePostal', v)}
-          keyboardType="numeric"
-        />
-
-        <ChampTexte
-          label="Pourquoi souhaites-tu utiliser Cœur à truffe ? (optionnel)"
-          placeholder="ex: mieux gérer mon stress"
-          value={form.motivation}
-          onChangeText={(v) => handleChange('motivation', v)}
-        />
-
+        <ChampTexte label="Rue (optionnel)" placeholder="ex: 12 rue du Bonheur" value={form.adresseRue} onChangeText={(v) => handleChange('adresseRue', v)} />
+        <ChampTexte label="Ville (optionnel)" placeholder="ex: Lyon" value={form.adresseVille} onChangeText={(v) => handleChange('adresseVille', v)} />
+        <ChampTexte label="Code Postal (optionnel)" placeholder="ex: 69000" value={form.adresseCodePostal} onChangeText={(v) => handleChange('adresseCodePostal', v)} keyboardType="numeric" />
+        <ChampTexte label="Pourquoi souhaites-tu utiliser Cœur à truffe ? (optionnel)" placeholder="ex: mieux gérer mon stress" value={form.motivation} onChangeText={(v) => handleChange('motivation', v)} />
         <CaseConsentement value={form.consentement} onChange={(v) => handleChange('consentement', v)} />
-
         {isLoading ? (
           <ActivityIndicator size="large" color="#A38ACF" />
         ) : (
